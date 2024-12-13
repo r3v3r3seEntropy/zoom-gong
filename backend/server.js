@@ -3,8 +3,8 @@ const axios = require('axios');
 const session = require('express-session');
 const cors = require('cors');
 
-const zoomClientId = 'ares8dVjRtCeXcBUakCwhw';
-const zoomClientSecret = 'S62trRukaSlzokhUsrJxniLKjmVtZirL';
+const zoomClientId = 'pC6fhDfTLmRugGqdAVVhg';
+const zoomClientSecret = 'IA6UP6IAIjOkCeVz65DCZA9uLmobC9Gw';
 const redirectUri = 'http://localhost:4000/auth/zoom/callback';
 
 const app = express();
