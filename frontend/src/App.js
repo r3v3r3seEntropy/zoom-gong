@@ -30,6 +30,32 @@ const App = () => {
     }
   };
 
+
+  const zoomLogout = () => {
+    // URL for Zoom logout (update if necessary)
+    //const logoutUrl = "https://zoom.us/logout";
+    const logoutUrl = `https://zoom.us/logout?redirect_url=${encodeURIComponent(
+      "http://localhost:3000"
+    )}`;
+
+    // Redirect the user to Zoom logout page
+    window.location.href = logoutUrl;
+
+    // Alternatively, if you are using OAuth, you can revoke the token
+    // Example:
+    // fetch('https://zoom.us/oauth/revoke', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/x-www-form-urlencoded',
+    //     'Authorization': `Basic ${btoa(CLIENT_ID + ':' + CLIENT_SECRET)}`
+    //   },
+    //   body: new URLSearchParams({ token: ACCESS_TOKEN })
+    // }).then(response => {
+    //   console.log('Logged out successfully');
+    // }).catch(err => console.error(err));
+  };
+
+
   const fetchRecordings = async () => {
     try {
       const response = await axios.get('http://localhost:4000/api/zoom/recordings');
@@ -121,7 +147,7 @@ const App = () => {
   return (
     <div style={styles.appContainer}>
       <div style={styles.sidebar}>
-        <h1 style={styles.logo}>My App</h1>
+        <h1 style={styles.logo}>Zoom Media Uploader</h1>
         <nav style={styles.nav}>
           <a href="#profile" style={styles.navLink}>Profile</a>
           <a href="#recordings" style={styles.navLink}>Recordings</a>
@@ -137,15 +163,18 @@ const App = () => {
               style={styles.avatar}
             />
             <div>
-              <h2 style={styles.userName}>Aritra Das</h2>
+              <h2 style={styles.userName}>John Doe</h2>
               <p style={styles.planInfo}>Current Plan: Workplace Basic</p>
             </div>
+          </div>
+          <div>
+            <h2 ><button onClick={zoomLogout} style={styles.logout}>Logout</button></h2>
           </div>
         </div>
 
         <div style={styles.bodyContent}>
           <div style={styles.recordingsContainer}>
-            <h2 style={styles.headerTitle}>Recordings and Transcripts</h2>
+            <h2 style={styles.headerTitle}>Meetings Recordings</h2>
 
             {/* Only Cloud recordings tab */}
             <div style={styles.tabs}>
@@ -181,7 +210,7 @@ const App = () => {
               <table style={styles.table}>
                 <thead>
                   <tr>
-                    <th style={styles.th}>Thumbnail</th>
+                    <th style={styles.th}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Thumbnail</th>
                     <th style={styles.th}>Topic</th>
                     <th style={styles.th}>Meeting ID</th>
                     <th style={styles.th}>Start time</th>
@@ -229,8 +258,20 @@ const App = () => {
                           <td style={styles.td}>{filesCount} {filesCount === 1 ? 'File' : 'Files'} ({sizeKB} KB)</td>
                           <td style={styles.td}>
                             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                              <button style={styles.iconActionBtn} onClick={handleShareClick}>Share</button>
-                              <button style={styles.iconActionBtn}>...</button>
+                              <button style={styles.iconZoomInfoActionBtn} onClick={handleShareClick}>
+                              <img
+                                  src="zoominfo-Logo.png" // Replace with your image path
+                                  alt="icon button"
+                                  style={{ width: "70px", height: "35px" }}
+                                />
+                                </button>
+                              <button style={styles.iconGongInfoActionBtn}>
+                              <img
+                                  src="gong.png" // Replace with your image path
+                                  alt="icon button"
+                                  style={{ width: "70px", height: "35px" }}
+                                />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -432,6 +473,22 @@ const styles = {
     fontSize: '0.9rem',
     color: '#666'
   },
+
+  logout :{
+    fontSize: '1.1rem',
+    margin: '0 0 5px 0',
+    //color: '#333',
+    position: "absolute",
+    top: "30px",
+    right: "40px",
+    textDecoration: "none",
+    backgroundColor: "#696867",
+    color: "white",
+    padding: "10px 20px",
+    borderRadius: "3px",
+    fontSize: "14px",
+    cursor: "pointer"
+  },
   bodyContent: {
     flex: 1,
     display: 'flex',
@@ -611,13 +668,22 @@ const styles = {
     cursor: 'not-allowed',
     color: '#999'
   },
-  iconActionBtn: {
-    padding: '5px 8px',
-    border: '1px solid #ddd',
+  iconZoomInfoActionBtn: {
+    padding: '12px 16px',
+    border: 'none',
     borderRadius: '4px',
-    background: '#fff',
+    background: '#C70039',
     cursor: 'pointer',
-    fontSize: '14px'
+    fontSize: '15px'
+  },
+  iconGongInfoActionBtn: {
+    padding: '12px 16px',
+    border: 'none',
+    borderRadius: '4px',
+    background: 'white',
+    cursor: 'pointer',
+    fontSize: '15px',
+    transition: 'opacity .4s'
   },
 
   // Modal styles
