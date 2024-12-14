@@ -75,6 +75,13 @@ const App = () => {
     alert('Google Sign-In not implemented.');
   };
 
+  const handleSignInWithMS = () => {
+    // Placeholder for Google Sign-In
+    alert('Google Sign-In not implemented.');
+  };
+
+
+
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
     return date.toLocaleString();
@@ -132,10 +139,30 @@ const App = () => {
           </div>
           <div style={styles.signInRight}>
             <h2 style={styles.signInTitle}>Sign In</h2>
-            <p style={styles.dividerText}>Or sign in with</p>
             <div style={styles.socialButtons}>
-              <button style={styles.ssoBtn} onClick={handleSignInWithZoom}>Zoom SSO</button>
-              <button style={styles.ssoBtn} onClick={handleSignInWithGoogle}>Google</button>
+              <button style={styles.ssoBtn} onClick={handleSignInWithZoom}>
+              <img
+                                  src="zoom.svg" // Replace with your image path
+                                  alt="icon button"
+                                  style={{ width: "30px", height: "30px" }}
+                                />
+                </button>
+              <button style={styles.ssoBtn} onClick={handleSignInWithGoogle}>
+              <img
+                                  src="google.svg" // Replace with your image path
+                                  alt="icon button"
+                                  style={{ width: "30px", height: "30px" }}
+                                />
+              </button>
+
+
+              <button style={styles.ssoBtn} onClick={handleSignInWithMS}>
+              <img
+                                  src="ms.svg" // Replace with your image path
+                                  alt="icon button"
+                                  style={{ width: "30px", height: "30px" }}
+                                />
+              </button>
             </div>
           </div>
         </div>
