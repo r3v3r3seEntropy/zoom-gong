@@ -34,7 +34,6 @@ const App = () => {
     }
   };
 
-<<<<<<< HEAD
 
   const zoomLogout = () => {
     // URL for Zoom logout (update if necessary)
@@ -61,7 +60,6 @@ const App = () => {
   };
 
 
-=======
   const checkGoogleStatus = async () => {
     try {
       const response = await axios.get('http://localhost:4000/api/google/status');
@@ -74,7 +72,6 @@ const App = () => {
     }
   };
 
->>>>>>> 0eb6413 (addedgoogle)
   const fetchRecordings = async () => {
     try {
       const response = await axios.get('http://localhost:4000/api/zoom/recordings');
@@ -247,7 +244,6 @@ const App = () => {
               <p style={styles.planInfo}>Current Plan: Workplace Basic</p>
             </div>
           </div>
-<<<<<<< HEAD
           <div>
             <h2 ><button onClick={zoomLogout} style={styles.logout}>Logout</button></h2>
           </div>
@@ -271,7 +267,6 @@ const App = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-=======
           {/* Logout button at top-right */}
           <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
         </div>
@@ -282,7 +277,6 @@ const App = () => {
               <h2 style={styles.headerTitle}>Zoom Recordings and Transcripts</h2>
               <div style={styles.tabs}>
                 <div style={{ ...styles.tab, ...styles.activeTab }}>Cloud recordings</div>
->>>>>>> 0eb6413 (addedgoogle)
               </div>
 
               <div style={styles.topBar}>
@@ -301,7 +295,6 @@ const App = () => {
                 </div>
               </div>
 
-<<<<<<< HEAD
             <div style={styles.tableContainer}>
               <table style={styles.table}>
                 <thead>
@@ -317,7 +310,6 @@ const App = () => {
                 </thead>
                 <tbody>
                   {filteredRecordings.length === 0 ? (
-=======
               <div style={styles.viewControlsRow}>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                   <button style={styles.viewToggleBtn}>▦</button>
@@ -329,7 +321,6 @@ const App = () => {
               <div style={styles.tableContainer}>
                 <table style={styles.table}>
                   <thead>
->>>>>>> 0eb6413 (addedgoogle)
                     <tr>
                       <th style={styles.th}>Thumbnail</th>
                       <th style={styles.th}>Topic</th>
@@ -369,7 +360,6 @@ const App = () => {
                                   </div>
                                 </div>
                               </div>
-<<<<<<< HEAD
                             </div>
                           </td>
                           <td style={styles.td}>{meeting.topic}</td>
@@ -404,7 +394,6 @@ const App = () => {
                 </tbody>
               </table>
             </div>
-=======
                             </td>
                             <td style={styles.td}>{meeting.topic}</td>
                             <td style={styles.td}>{meeting.id}</td>
@@ -438,7 +427,6 @@ const App = () => {
                   </tbody>
                 </table>
               </div>
->>>>>>> 0eb6413 (addedgoogle)
 
               <div style={styles.paginationRow}>
                 <div style={styles.paginationControls}>
@@ -702,7 +690,6 @@ const styles = {
     fontSize: '0.9rem',
     color: '#666'
   },
-<<<<<<< HEAD
 
   logout: {
     fontSize: '1.1rem',
@@ -718,7 +705,6 @@ const styles = {
     borderRadius: "3px",
     fontSize: "14px",
     cursor: "pointer"
-=======
   logoutBtn: {
     position: 'absolute',
     top: '20px',
@@ -730,7 +716,6 @@ const styles = {
     cursor: 'pointer',
     fontSize: '14px',
     color: '#fff'
->>>>>>> 0eb6413 (addedgoogle)
   },
   bodyContent: {
     flex: 1,
@@ -913,7 +898,6 @@ const styles = {
   iconZoomInfoActionBtn: {
     padding: '12px 16px',
     border: 'none',
-<<<<<<< HEAD
     borderRadius: '4px',
     background: '#C70039',
     cursor: 'pointer',
@@ -959,8 +943,6 @@ const styles = {
   modalBtn: {
     padding: '8px 12px',
     border: '1px solid #ddd',
-=======
->>>>>>> 0eb6413 (addedgoogle)
     borderRadius: '4px',
     background: '#C70039',
     cursor: 'pointer',
