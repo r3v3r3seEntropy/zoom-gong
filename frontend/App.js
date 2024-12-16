@@ -34,34 +34,6 @@ const App = () => {
     }
   };
 
-<<<<<<< HEAD
-
-  const zoomLogout = () => {
-    // URL for Zoom logout (update if necessary)
-    //const logoutUrl = "https://zoom.us/logout";
-    const logoutUrl = `https://zoom.us/logout?redirect_url=${encodeURIComponent(
-      "http://localhost:3000"
-    )}`;
-
-    // Redirect the user to Zoom logout page
-    window.location.href = logoutUrl;
-
-    // Alternatively, if you are using OAuth, you can revoke the token
-    // Example:
-    // fetch('https://zoom.us/oauth/revoke', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/x-www-form-urlencoded',
-    //     'Authorization': `Basic ${btoa(CLIENT_ID + ':' + CLIENT_SECRET)}`
-    //   },
-    //   body: new URLSearchParams({ token: ACCESS_TOKEN })
-    // }).then(response => {
-    //   console.log('Logged out successfully');
-    // }).catch(err => console.error(err));
-  };
-
-
-=======
   const checkGoogleStatus = async () => {
     try {
       const response = await axios.get('http://localhost:4000/api/google/status');
@@ -74,7 +46,6 @@ const App = () => {
     }
   };
 
->>>>>>> 0eb641367e2e7725d7eeb786966d7eb5b6e8c259
   const fetchRecordings = async () => {
     try {
       const response = await axios.get('http://localhost:4000/api/zoom/recordings');
@@ -113,13 +84,6 @@ const App = () => {
       console.error('Error logging out:', error);
     }
   };
-
-  const handleSignInWithMS = () => {
-    // Placeholder for Google Sign-In
-    alert('Google Sign-In not implemented.');
-  };
-
-
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
@@ -164,17 +128,10 @@ const App = () => {
       <div style={styles.signInContainer}>
         <div style={styles.signInBox}>
           <div style={styles.signInLeft}>
-<<<<<<< HEAD
-            <h2 style={{ color: '#fff', marginBottom: '20px' }}>zoom Workplace</h2>
-            <p style={{ color: '#fff', fontSize: '14px', lineHeight: '1.5' }}>
-              Work happy with AI Companion 2.0* coming soon
-              <br /><br />
-=======
             <h2 style={{color: '#fff', marginBottom: '20px'}}>Workplace</h2>
             <p style={{color: '#fff', fontSize: '14px', lineHeight: '1.5'}}>
               Work happy with AI Companion 2.0 (coming soon)  
               <br/><br/>
->>>>>>> 0eb641367e2e7725d7eeb786966d7eb5b6e8c259
               Get more done by surfacing important information, prioritizing what matters most,
               and turning every interaction into action with your AI personal assistant.
             </p>
@@ -182,37 +139,19 @@ const App = () => {
           </div>
           <div style={styles.signInRight}>
             <h2 style={styles.signInTitle}>Sign In</h2>
+            <p style={styles.dividerText}>Or sign in with</p>
             <div style={styles.socialButtons}>
               <button style={styles.ssoBtn} onClick={handleSignInWithZoom}>
                 <img
-<<<<<<< HEAD
-                  src="zoom.svg" // Replace with your image path
-                  alt="icon button"
-=======
                   src={process.env.PUBLIC_URL + '/zoom.svg'}
                   alt="Zoom SSO"
->>>>>>> 0eb641367e2e7725d7eeb786966d7eb5b6e8c259
                   style={{ width: "30px", height: "30px" }}
                 />
               </button>
               <button style={styles.ssoBtn} onClick={handleSignInWithGoogle}>
                 <img
-<<<<<<< HEAD
-                  src="google.svg" // Replace with your image path
-                  alt="icon button"
-                  style={{ width: "30px", height: "30px" }}
-                />
-              </button>
-
-
-              <button style={styles.ssoBtn} onClick={handleSignInWithMS}>
-                <img
-                  src="ms.svg" // Replace with your image path
-                  alt="icon button"
-=======
                   src={process.env.PUBLIC_URL + '/google.svg'}
                   alt="Google SSO"
->>>>>>> 0eb641367e2e7725d7eeb786966d7eb5b6e8c259
                   style={{ width: "30px", height: "30px" }}
                 />
               </button>
@@ -227,7 +166,7 @@ const App = () => {
   return (
     <div style={styles.appContainer}>
       <div style={styles.sidebar}>
-        <h1 style={styles.logo}>Zoom Media Uploader</h1>
+        <h1 style={styles.logo}>My App</h1>
         <nav style={styles.nav}>
           <a href="#profile" style={styles.navLink}>Profile</a>
           <a href="#recordings" style={styles.navLink}>Recordings</a>
@@ -243,35 +182,10 @@ const App = () => {
               style={styles.avatar}
             />
             <div>
-              <h2 style={styles.userName}>John Doe</h2>
+              <h2 style={styles.userName}>Aritra Das</h2>
               <p style={styles.planInfo}>Current Plan: Workplace Basic</p>
             </div>
           </div>
-<<<<<<< HEAD
-          <div>
-            <h2 ><button onClick={zoomLogout} style={styles.logout}>Logout</button></h2>
-          </div>
-        </div>
-
-        <div style={styles.bodyContent}>
-          <div style={styles.recordingsContainer}>
-            <h2 style={styles.headerTitle}>Meetings Recordings</h2>
-
-            {/* Only Cloud recordings tab */}
-            <div style={styles.tabs}>
-              <div style={{ ...styles.tab, ...styles.activeTab }}>Cloud recordings</div>
-            </div>
-
-            <div style={styles.topBar}>
-              <div style={styles.searchRow}>
-                <input
-                  type="text"
-                  placeholder="Search by topic or meeting ID"
-                  style={styles.searchInput}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-=======
           {/* Logout button at top-right */}
           <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
         </div>
@@ -282,7 +196,6 @@ const App = () => {
               <h2 style={styles.headerTitle}>Zoom Recordings and Transcripts</h2>
               <div style={styles.tabs}>
                 <div style={{ ...styles.tab, ...styles.activeTab }}>Cloud recordings</div>
->>>>>>> 0eb641367e2e7725d7eeb786966d7eb5b6e8c259
               </div>
 
               <div style={styles.topBar}>
@@ -301,23 +214,6 @@ const App = () => {
                 </div>
               </div>
 
-<<<<<<< HEAD
-            <div style={styles.tableContainer}>
-              <table style={styles.table}>
-                <thead>
-                  <tr>
-                    <th style={styles.th}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Thumbnail</th>
-                    <th style={styles.th}>Topic</th>
-                    <th style={styles.th}>Meeting ID</th>
-                    <th style={styles.th}>Start time</th>
-                    <th style={styles.th}>Participants</th>
-                    <th style={styles.th}>File size</th>
-                    <th style={styles.th}></th>{/* Actions column */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRecordings.length === 0 ? (
-=======
               <div style={styles.viewControlsRow}>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                   <button style={styles.viewToggleBtn}>▦</button>
@@ -329,7 +225,6 @@ const App = () => {
               <div style={styles.tableContainer}>
                 <table style={styles.table}>
                   <thead>
->>>>>>> 0eb641367e2e7725d7eeb786966d7eb5b6e8c259
                     <tr>
                       <th style={styles.th}>Thumbnail</th>
                       <th style={styles.th}>Topic</th>
@@ -369,42 +264,6 @@ const App = () => {
                                   </div>
                                 </div>
                               </div>
-<<<<<<< HEAD
-                            </div>
-                          </td>
-                          <td style={styles.td}>{meeting.topic}</td>
-                          <td style={styles.td}>{meeting.id}</td>
-                          <td style={styles.td}>{formatDate(meeting.start_time)}</td>
-                          <td style={styles.td}>
-                            <div style={styles.participantIcon}>R</div>
-                          </td>
-                          <td style={styles.td}>{filesCount} {filesCount === 1 ? 'File' : 'Files'} ({sizeKB} KB)</td>
-                          <td style={styles.td}>
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                              <button style={styles.iconZoomInfoActionBtn} onClick={handleShareClick}>
-                                <img
-                                  src="zoominfo-Logo.png" // Replace with your image path
-                                  alt="icon button"
-                                  style={{ width: "70px", height: "35px" }}
-                                />
-                              </button>
-                              <button style={styles.iconGongInfoActionBtn}>
-                                <img
-                                  src="gong.png" // Replace with your image path
-                                  alt="icon button"
-                                  style={{ width: "70px", height: "35px" }}
-                                />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-=======
                             </td>
                             <td style={styles.td}>{meeting.topic}</td>
                             <td style={styles.td}>{meeting.id}</td>
@@ -438,7 +297,6 @@ const App = () => {
                   </tbody>
                 </table>
               </div>
->>>>>>> 0eb641367e2e7725d7eeb786966d7eb5b6e8c259
 
               <div style={styles.paginationRow}>
                 <div style={styles.paginationControls}>
@@ -526,9 +384,9 @@ const App = () => {
           <div style={styles.modalContent}>
             {uploading ? (
               <div>
-                <p style={{ marginBottom: '20px', textAlign: 'center' }}>Uploading your file...</p>
+                <p style={{marginBottom: '20px', textAlign:'center'}}>Uploading your file...</p>
                 <div style={styles.progressBarContainer}>
-                  <div style={{ ...styles.progressBarFill, width: `${uploadProgress}%` }}></div>
+                  <div style={{...styles.progressBarFill, width: ${uploadProgress}%}}></div>
                 </div>
               </div>
             ) : (
@@ -548,7 +406,7 @@ const App = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                <div style={{display:'flex', gap:'10px', justifyContent:'flex-end'}}>
                   <button style={styles.modalBtn} onClick={() => setShowModal(false)}>Cancel</button>
                   <button style={styles.modalBtn} onClick={handleModalConnect}>Connect</button>
                 </div>
@@ -702,23 +560,6 @@ const styles = {
     fontSize: '0.9rem',
     color: '#666'
   },
-<<<<<<< HEAD
-
-  logout: {
-    fontSize: '1.1rem',
-    margin: '0 0 5px 0',
-    //color: '#333',
-    position: "absolute",
-    top: "30px",
-    right: "40px",
-    textDecoration: "none",
-    backgroundColor: "#696867",
-    color: "white",
-    padding: "10px 20px",
-    borderRadius: "3px",
-    fontSize: "14px",
-    cursor: "pointer"
-=======
   logoutBtn: {
     position: 'absolute',
     top: '20px',
@@ -730,7 +571,6 @@ const styles = {
     cursor: 'pointer',
     fontSize: '14px',
     color: '#fff'
->>>>>>> 0eb641367e2e7725d7eeb786966d7eb5b6e8c259
   },
   bodyContent: {
     flex: 1,
@@ -913,7 +753,6 @@ const styles = {
   iconZoomInfoActionBtn: {
     padding: '12px 16px',
     border: 'none',
-<<<<<<< HEAD
     borderRadius: '4px',
     background: '#C70039',
     cursor: 'pointer',
@@ -932,60 +771,49 @@ const styles = {
   // Modal styles
   modalOverlay: {
     position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000
+    top:0,
+    left:0,
+    width:'100%',
+    height:'100%',
+    backgroundColor:'rgba(0,0,0,0.5)',
+    display:'flex',
+    justifyContent:'center',
+    alignItems:'center',
+    zIndex:1000
   },
   modalContent: {
-    background: '#fff',
-    padding: '20px',
-    borderRadius: '8px',
-    width: '300px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px'
+    background:'#fff',
+    padding:'20px',
+    borderRadius:'8px',
+    width:'300px',
+    display:'flex',
+    flexDirection:'column',
+    gap:'10px'
   },
   modalInput: {
-    padding: '8px',
-    border: '1px solid #ddd',
-    borderRadius: '4px'
+    padding:'8px',
+    border:'1px solid #ddd',
+    borderRadius:'4px'
   },
   modalBtn: {
-    padding: '8px 12px',
-    border: '1px solid #ddd',
-=======
->>>>>>> 0eb641367e2e7725d7eeb786966d7eb5b6e8c259
-    borderRadius: '4px',
-    background: '#C70039',
-    cursor: 'pointer',
-    fontSize: '15px'
-  },
-  iconGongInfoActionBtn: {
-    padding: '12px 16px',
-    border: 'none',
-    borderRadius: '4px',
-    background: 'white',
-    cursor: 'pointer',
-    fontSize: '15px',
-    transition: 'opacity .4s'
+    padding:'8px 12px',
+    border:'1px solid #ddd',
+    borderRadius:'4px',
+    background:'#fff',
+    cursor:'pointer',
+    fontSize:'14px'
   },
   progressBarContainer: {
-    width: '100%',
-    height: '10px',
-    backgroundColor: '#eee',
-    borderRadius: '4px',
-    overflow: 'hidden'
+    width:'100%',
+    height:'10px',
+    backgroundColor:'#eee',
+    borderRadius:'4px',
+    overflow:'hidden'
   },
   progressBarFill: {
-    height: '100%',
-    backgroundColor: 'green',
-    transition: 'width 0.1s linear'
+    height:'100%',
+    backgroundColor:'green',
+    transition:'width 0.1s linear'
   }
 };
 
