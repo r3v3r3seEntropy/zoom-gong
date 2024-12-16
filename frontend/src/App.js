@@ -8,14 +8,18 @@ const App = () => {
   const [recordings, setRecordings] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const [connectedToGoogle, setConnectedToGoogle] = useState(false);
+  const [googleRecordings, setGoogleRecordings] = useState([]);
+
   const [showModal, setShowModal] = useState(false);
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0); // For progress bar
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     checkZoomStatus();
+    checkGoogleStatus();
   }, []);
 
   const checkZoomStatus = async () => {
@@ -30,23 +34,55 @@ const App = () => {
     }
   };
 
+  const checkGoogleStatus = async () => {
+    try {
+      const response = await axios.get('http://localhost:4000/api/google/status');
+      if (response.data.connected) {
+        setConnectedToGoogle(true);
+        fetchGoogleRecordings();
+      }
+    } catch (error) {
+      console.error('Error checking Google status:', error);
+    }
+  };
+
   const fetchRecordings = async () => {
     try {
       const response = await axios.get('http://localhost:4000/api/zoom/recordings');
       setRecordings(response.data.meetings || []);
     } catch (error) {
-      console.error('Error fetching recordings:', error);
+      console.error('Error fetching Zoom recordings:', error);
+    }
+  };
+
+  const fetchGoogleRecordings = async () => {
+    try {
+      const response = await axios.get('http://localhost:4000/api/google/recordings');
+      setGoogleRecordings(response.data.files || []);
+    } catch (error) {
+      console.error('Error fetching Google recordings:', error);
     }
   };
 
   const handleSignInWithZoom = () => {
-    // Redirect to Zoom auth
     window.location.href = 'http://localhost:4000/auth/zoom';
   };
 
   const handleSignInWithGoogle = () => {
-    // Placeholder for Google Sign-In
-    alert('Google Sign-In not implemented.');
+    window.location.href = 'http://localhost:4000/auth/google';
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.get('http://localhost:4000/api/logout');
+      // Reset state after logout
+      setConnectedToZoom(false);
+      setConnectedToGoogle(false);
+      setRecordings([]);
+      setGoogleRecordings([]);
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
   const formatDate = (dateStr) => {
@@ -61,12 +97,10 @@ const App = () => {
   });
 
   const handleShareClick = () => {
-    // Open modal
     setShowModal(true);
   };
 
   const handleModalConnect = () => {
-    // Simulate uploading with a progress bar
     setUploading(true);
     setUploadProgress(0);
 
@@ -77,27 +111,26 @@ const App = () => {
         } else {
           clearInterval(interval);
           setTimeout(() => {
-            // After reaching 100%, close the modal
             setUploading(false);
             setShowModal(false);
             setUserId('');
             setPassword('');
-          }, 500); // small delay after completion
+          }, 500);
           return prev;
         }
       });
-    }, 100); // increments every 100ms
+    }, 100);
   };
 
-  // If not connectedToZoom, show sign-in page
-  if (!connectedToZoom) {
+  // If not connected to either Zoom or Google, show sign-in page
+  if (!connectedToZoom && !connectedToGoogle) {
     return (
       <div style={styles.signInContainer}>
         <div style={styles.signInBox}>
           <div style={styles.signInLeft}>
-            <h2 style={{color: '#fff', marginBottom: '20px'}}>zoom Workplace</h2>
+            <h2 style={{color: '#fff', marginBottom: '20px'}}>Workplace</h2>
             <p style={{color: '#fff', fontSize: '14px', lineHeight: '1.5'}}>
-              Work happy with AI Companion 2.0* coming soon  
+              Work happy with AI Companion 2.0 (coming soon)  
               <br/><br/>
               Get more done by surfacing important information, prioritizing what matters most,
               and turning every interaction into action with your AI personal assistant.
@@ -108,8 +141,20 @@ const App = () => {
             <h2 style={styles.signInTitle}>Sign In</h2>
             <p style={styles.dividerText}>Or sign in with</p>
             <div style={styles.socialButtons}>
-              <button style={styles.ssoBtn} onClick={handleSignInWithZoom}>Zoom SSO</button>
-              <button style={styles.ssoBtn} onClick={handleSignInWithGoogle}>Google</button>
+              <button style={styles.ssoBtn} onClick={handleSignInWithZoom}>
+                <img
+                  src={process.env.PUBLIC_URL + '/zoom.svg'}
+                  alt="Zoom SSO"
+                  style={{ width: "30px", height: "30px" }}
+                />
+              </button>
+              <button style={styles.ssoBtn} onClick={handleSignInWithGoogle}>
+                <img
+                  src={process.env.PUBLIC_URL + '/google.svg'}
+                  alt="Google SSO"
+                  style={{ width: "30px", height: "30px" }}
+                />
+              </button>
             </div>
           </div>
         </div>
@@ -117,7 +162,7 @@ const App = () => {
     );
   }
 
-  // If connectedToZoom, show recordings page
+  // If connected to at least one service, show recordings page
   return (
     <div style={styles.appContainer}>
       <div style={styles.sidebar}>
@@ -141,114 +186,196 @@ const App = () => {
               <p style={styles.planInfo}>Current Plan: Workplace Basic</p>
             </div>
           </div>
+          {/* Logout button at top-right */}
+          <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
         </div>
 
         <div style={styles.bodyContent}>
-          <div style={styles.recordingsContainer}>
-            <h2 style={styles.headerTitle}>Recordings and Transcripts</h2>
-
-            {/* Only Cloud recordings tab */}
-            <div style={styles.tabs}>
-              <div style={{ ...styles.tab, ...styles.activeTab }}>Cloud recordings</div>
-            </div>
-
-            <div style={styles.topBar}>
-              <div style={styles.searchRow}>
-                <input
-                  type="text"
-                  placeholder="Search by topic or meeting ID"
-                  style={styles.searchInput}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+          {connectedToZoom && (
+            <div style={styles.recordingsContainer}>
+              <h2 style={styles.headerTitle}>Zoom Recordings and Transcripts</h2>
+              <div style={styles.tabs}>
+                <div style={{ ...styles.tab, ...styles.activeTab }}>Cloud recordings</div>
               </div>
-              <div style={styles.iconsRow}>
-                <span style={styles.iconBtn}>Trash (0)</span>
-                <span style={styles.iconBtn}>Document</span>
-              </div>
-            </div>
 
-            <div style={styles.viewControlsRow}>
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                {/* View toggle icons are placeholders */}
-                <button style={styles.viewToggleBtn}>▦</button>
-                <button style={{ ...styles.viewToggleBtn, ...styles.activeViewToggle }}>▤</button>
-                <button style={styles.exportBtn}>Export</button>
+              <div style={styles.topBar}>
+                <div style={styles.searchRow}>
+                  <input
+                    type="text"
+                    placeholder="Search by topic or meeting ID"
+                    style={styles.searchInput}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div style={styles.iconsRow}>
+                  <span style={styles.iconBtn}>Trash (0)</span>
+                  <span style={styles.iconBtn}>Document</span>
+                </div>
               </div>
-            </div>
 
-            <div style={styles.tableContainer}>
-              <table style={styles.table}>
-                <thead>
-                  <tr>
-                    <th style={styles.th}>Thumbnail</th>
-                    <th style={styles.th}>Topic</th>
-                    <th style={styles.th}>Meeting ID</th>
-                    <th style={styles.th}>Start time</th>
-                    <th style={styles.th}>Participants</th>
-                    <th style={styles.th}>File size</th>
-                    <th style={styles.th}></th>{/* Actions column */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRecordings.length === 0 ? (
+              <div style={styles.viewControlsRow}>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <button style={styles.viewToggleBtn}>▦</button>
+                  <button style={{ ...styles.viewToggleBtn, ...styles.activeViewToggle }}>▤</button>
+                  <button style={styles.exportBtn}>Export</button>
+                </div>
+              </div>
+
+              <div style={styles.tableContainer}>
+                <table style={styles.table}>
+                  <thead>
                     <tr>
-                      <td colSpan="7" style={styles.noResultsCell}>No recordings found.</td>
+                      <th style={styles.th}>Thumbnail</th>
+                      <th style={styles.th}>Topic</th>
+                      <th style={styles.th}>Meeting ID</th>
+                      <th style={styles.th}>Start time</th>
+                      <th style={styles.th}>Participants</th>
+                      <th style={styles.th}>File size</th>
+                      <th style={styles.th}></th>
                     </tr>
-                  ) : (
-                    filteredRecordings.map((meeting) => {
-                      const recordingFile = meeting.recording_files && meeting.recording_files[0];
-                      const thumbnailURL = recordingFile?.thumbnail_url || 'https://via.placeholder.com/150x80';
+                  </thead>
+                  <tbody>
+                    {filteredRecordings.length === 0 ? (
+                      <tr>
+                        <td colSpan="7" style={styles.noResultsCell}>No recordings found.</td>
+                      </tr>
+                    ) : (
+                      filteredRecordings.map((meeting) => {
+                        const recordingFile = meeting.recording_files && meeting.recording_files[0];
+                        const thumbnailURL = recordingFile?.thumbnail_url || 'https://via.placeholder.com/150x80';
 
-                      const totalSize = meeting.recording_files
-                        ? meeting.recording_files.reduce((acc, f) => acc + (f.file_size || 0), 0)
-                        : 0;
-                      const sizeKB = (totalSize / 1024).toFixed(0);
-                      const filesCount = meeting.recording_files ? meeting.recording_files.length : 0;
+                        const totalSize = meeting.recording_files
+                          ? meeting.recording_files.reduce((acc, f) => acc + (f.file_size || 0), 0)
+                          : 0;
+                        const sizeKB = (totalSize / 1024).toFixed(0);
+                        const filesCount = meeting.recording_files ? meeting.recording_files.length : 0;
 
-                      return (
-                        <tr key={meeting.uuid} style={styles.tr}>
-                          <td style={styles.td}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <input type="checkbox" />
-                              <div style={styles.thumbnailWrapper}>
-                                <img src={thumbnailURL} alt="Recording Thumbnail" style={styles.thumbnailImage} />
-                                <div style={styles.thumbOverlay}>
-                                  <span style={styles.overlayItem}>👁️ 0</span>
-                                  <span style={styles.overlayItem}>00:00:11</span>
+                        return (
+                          <tr key={meeting.uuid} style={styles.tr}>
+                            <td style={styles.td}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <input type="checkbox" />
+                                <div style={styles.thumbnailWrapper}>
+                                  <img src={thumbnailURL} alt="Recording Thumbnail" style={styles.thumbnailImage} />
+                                  <div style={styles.thumbOverlay}>
+                                    <span style={styles.overlayItem}>👁️ 0</span>
+                                    <span style={styles.overlayItem}>00:00:11</span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </td>
-                          <td style={styles.td}>{meeting.topic}</td>
-                          <td style={styles.td}>{meeting.id}</td>
-                          <td style={styles.td}>{formatDate(meeting.start_time)}</td>
-                          <td style={styles.td}>
-                            <div style={styles.participantIcon}>R</div>
-                          </td>
-                          <td style={styles.td}>{filesCount} {filesCount === 1 ? 'File' : 'Files'} ({sizeKB} KB)</td>
-                          <td style={styles.td}>
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                              <button style={styles.iconActionBtn} onClick={handleShareClick}>Share</button>
-                              <button style={styles.iconActionBtn}>...</button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
+                            </td>
+                            <td style={styles.td}>{meeting.topic}</td>
+                            <td style={styles.td}>{meeting.id}</td>
+                            <td style={styles.td}>{formatDate(meeting.start_time)}</td>
+                            <td style={styles.td}>
+                              <div style={styles.participantIcon}>R</div>
+                            </td>
+                            <td style={styles.td}>{filesCount} {filesCount === 1 ? 'File' : 'Files'} ({sizeKB} KB)</td>
+                            <td style={styles.td}>
+                              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                <button style={styles.iconZoomInfoActionBtn} onClick={handleShareClick}>
+                                  <img
+                                    src={process.env.PUBLIC_URL + '/zoominfo-Logo.png'}
+                                    alt="ZoomInfo"
+                                    style={{ width: "70px", height: "35px" }}
+                                  />
+                                </button>
+                                <button style={styles.iconGongInfoActionBtn}>
+                                  <img
+                                    src={process.env.PUBLIC_URL + '/gong.png'}
+                                    alt="Gong"
+                                    style={{ width: "70px", height: "35px" }}
+                                  />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
 
-            <div style={styles.paginationRow}>
-              <div style={styles.paginationControls}>
-                <button style={styles.paginationBtn} disabled>←</button>
-                <span>{filteredRecordings.length} result(s)</span>
-                <button style={styles.paginationBtn} disabled>→</button>
+              <div style={styles.paginationRow}>
+                <div style={styles.paginationControls}>
+                  <button style={styles.paginationBtn} disabled>←</button>
+                  <span>{filteredRecordings.length} result(s)</span>
+                  <button style={styles.paginationBtn} disabled>→</button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {connectedToGoogle && (
+            <div style={styles.recordingsContainer}>
+              <h2 style={styles.headerTitle}>Google Meet Recordings (Google Drive)</h2>
+              <div style={styles.tabs}>
+                <div style={{ ...styles.tab, ...styles.activeTab }}>Drive Videos</div>
+              </div>
+
+              <div style={styles.tableContainer}>
+                <table style={styles.table}>
+                  <thead>
+                    <tr>
+                      <th style={styles.th}>Thumbnail</th>
+                      <th style={styles.th}>Name</th>
+                      <th style={styles.th}>Created Time</th>
+                      <th style={styles.th}>Size (KB)</th>
+                      <th style={styles.th}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {googleRecordings.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" style={styles.noResultsCell}>No recordings found in Google Drive.</td>
+                      </tr>
+                    ) : (
+                      googleRecordings.map((file) => {
+                        const sizeKB = file.size ? (file.size / 1024).toFixed(0) : 0;
+                        return (
+                          <tr key={file.id} style={styles.tr}>
+                            <td style={styles.td}>
+                              <div style={styles.thumbnailWrapper}>
+                                {file.thumbnailLink ? (
+                                  <img src={file.thumbnailLink} alt="Thumbnail" style={styles.thumbnailImage} />
+                                ) : (
+                                  <div style={{...styles.thumbnailWrapper, display:'flex',justifyContent:'center',alignItems:'center'}}>No Thumbnail</div>
+                                )}
+                              </div>
+                            </td>
+                            <td style={styles.td}>{file.name}</td>
+                            <td style={styles.td}>{formatDate(file.createdTime)}</td>
+                            <td style={styles.td}>{sizeKB} KB</td>
+                            <td style={styles.td}>
+                              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                <button style={styles.iconZoomInfoActionBtn} onClick={handleShareClick}>
+                                  <img
+                                    src={process.env.PUBLIC_URL + '/zoominfo-Logo.png'}
+                                    alt="ZoomInfo"
+                                    style={{ width: "70px", height: "35px" }}
+                                  />
+                                </button>
+                                <button style={styles.iconGongInfoActionBtn}>
+                                  <img
+                                    src={process.env.PUBLIC_URL + '/gong.png'}
+                                    alt="Gong"
+                                    style={{ width: "70px", height: "35px" }}
+                                  />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 
@@ -410,7 +537,8 @@ const styles = {
     borderRadius: '8px',
     marginBottom: '20px',
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    position: 'relative'
   },
   profileInfo: {
     display: 'flex',
@@ -432,6 +560,18 @@ const styles = {
     fontSize: '0.9rem',
     color: '#666'
   },
+  logoutBtn: {
+    position: 'absolute',
+    top: '20px',
+    right: '20px',
+    padding: '10px 20px',
+    border: '1px solid #ddd',
+    backgroundColor: '#696867',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    color: '#fff'
+  },
   bodyContent: {
     flex: 1,
     display: 'flex',
@@ -439,7 +579,6 @@ const styles = {
     gap: '20px'
   },
 
-  // Recordings section
   recordingsContainer: {
     backgroundColor: '#ffffff',
     borderRadius: '8px',
@@ -611,13 +750,22 @@ const styles = {
     cursor: 'not-allowed',
     color: '#999'
   },
-  iconActionBtn: {
-    padding: '5px 8px',
-    border: '1px solid #ddd',
+  iconZoomInfoActionBtn: {
+    padding: '12px 16px',
+    border: 'none',
     borderRadius: '4px',
-    background: '#fff',
+    background: '#C70039',
     cursor: 'pointer',
-    fontSize: '14px'
+    fontSize: '15px'
+  },
+  iconGongInfoActionBtn: {
+    padding: '12px 16px',
+    border: 'none',
+    borderRadius: '4px',
+    background: 'white',
+    cursor: 'pointer',
+    fontSize: '15px',
+    transition: 'opacity .4s'
   },
 
   // Modal styles
