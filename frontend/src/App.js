@@ -128,10 +128,10 @@ const App = () => {
       <div style={styles.signInContainer}>
         <div style={styles.signInBox}>
           <div style={styles.signInLeft}>
-            <h2 style={{color: '#fff', marginBottom: '20px'}}>zoom Workplace</h2>
-            <p style={{color: '#fff', fontSize: '14px', lineHeight: '1.5'}}>
-              Work happy with AI Companion 2.0* coming soon  
-              <br/><br/>
+            <h2 style={{ color: '#fff', marginBottom: '20px' }}>zoom Workplace</h2>
+            <p style={{ color: '#fff', fontSize: '14px', lineHeight: '1.5' }}>
+              Work happy with AI Companion 2.0* coming soon
+              <br /><br />
               Get more done by surfacing important information, prioritizing what matters most,
               and turning every interaction into action with your AI personal assistant.
             </p>
@@ -141,27 +141,27 @@ const App = () => {
             <h2 style={styles.signInTitle}>Sign In</h2>
             <div style={styles.socialButtons}>
               <button style={styles.ssoBtn} onClick={handleSignInWithZoom}>
-              <img
-                                  src="zoom.svg" // Replace with your image path
-                                  alt="icon button"
-                                  style={{ width: "30px", height: "30px" }}
-                                />
-                </button>
+                <img
+                  src="zoom.svg" // Replace with your image path
+                  alt="icon button"
+                  style={{ width: "30px", height: "30px" }}
+                />
+              </button>
               <button style={styles.ssoBtn} onClick={handleSignInWithGoogle}>
-              <img
-                                  src="google.svg" // Replace with your image path
-                                  alt="icon button"
-                                  style={{ width: "30px", height: "30px" }}
-                                />
+                <img
+                  src="google.svg" // Replace with your image path
+                  alt="icon button"
+                  style={{ width: "30px", height: "30px" }}
+                />
               </button>
 
 
               <button style={styles.ssoBtn} onClick={handleSignInWithMS}>
-              <img
-                                  src="ms.svg" // Replace with your image path
-                                  alt="icon button"
-                                  style={{ width: "30px", height: "30px" }}
-                                />
+                <img
+                  src="ms.svg" // Replace with your image path
+                  alt="icon button"
+                  style={{ width: "30px", height: "30px" }}
+                />
               </button>
             </div>
           </div>
@@ -286,14 +286,14 @@ const App = () => {
                           <td style={styles.td}>
                             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                               <button style={styles.iconZoomInfoActionBtn} onClick={handleShareClick}>
-                              <img
+                                <img
                                   src="zoominfo-Logo.png" // Replace with your image path
                                   alt="icon button"
                                   style={{ width: "70px", height: "35px" }}
                                 />
-                                </button>
+                              </button>
                               <button style={styles.iconGongInfoActionBtn}>
-                              <img
+                                <img
                                   src="gong.png" // Replace with your image path
                                   alt="icon button"
                                   style={{ width: "70px", height: "35px" }}
@@ -325,9 +325,9 @@ const App = () => {
           <div style={styles.modalContent}>
             {uploading ? (
               <div>
-                <p style={{marginBottom: '20px', textAlign:'center'}}>Uploading your file...</p>
+                <p style={{ marginBottom: '20px', textAlign: 'center' }}>Uploading your file...</p>
                 <div style={styles.progressBarContainer}>
-                  <div style={{...styles.progressBarFill, width: `${uploadProgress}%`}}></div>
+                  <div style={{ ...styles.progressBarFill, width: `${uploadProgress}%` }}></div>
                 </div>
               </div>
             ) : (
@@ -347,7 +347,7 @@ const App = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <div style={{display:'flex', gap:'10px', justifyContent:'flex-end'}}>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                   <button style={styles.modalBtn} onClick={() => setShowModal(false)}>Cancel</button>
                   <button style={styles.modalBtn} onClick={handleModalConnect}>Connect</button>
                 </div>
@@ -501,7 +501,7 @@ const styles = {
     color: '#666'
   },
 
-  logout :{
+  logout: {
     fontSize: '1.1rem',
     margin: '0 0 5px 0',
     //color: '#333',
@@ -716,49 +716,49 @@ const styles = {
   // Modal styles
   modalOverlay: {
     position: 'fixed',
-    top:0,
-    left:0,
-    width:'100%',
-    height:'100%',
-    backgroundColor:'rgba(0,0,0,0.5)',
-    display:'flex',
-    justifyContent:'center',
-    alignItems:'center',
-    zIndex:1000
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000
   },
   modalContent: {
-    background:'#fff',
-    padding:'20px',
-    borderRadius:'8px',
-    width:'300px',
-    display:'flex',
-    flexDirection:'column',
-    gap:'10px'
+    background: '#fff',
+    padding: '20px',
+    borderRadius: '8px',
+    width: '300px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px'
   },
   modalInput: {
-    padding:'8px',
-    border:'1px solid #ddd',
-    borderRadius:'4px'
+    padding: '8px',
+    border: '1px solid #ddd',
+    borderRadius: '4px'
   },
   modalBtn: {
-    padding:'8px 12px',
-    border:'1px solid #ddd',
-    borderRadius:'4px',
-    background:'#fff',
-    cursor:'pointer',
-    fontSize:'14px'
+    padding: '8px 12px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    background: '#fff',
+    cursor: 'pointer',
+    fontSize: '14px'
   },
   progressBarContainer: {
-    width:'100%',
-    height:'10px',
-    backgroundColor:'#eee',
-    borderRadius:'4px',
-    overflow:'hidden'
+    width: '100%',
+    height: '10px',
+    backgroundColor: '#eee',
+    borderRadius: '4px',
+    overflow: 'hidden'
   },
   progressBarFill: {
-    height:'100%',
-    backgroundColor:'green',
-    transition:'width 0.1s linear'
+    height: '100%',
+    backgroundColor: 'green',
+    transition: 'width 0.1s linear'
   }
 };
 
