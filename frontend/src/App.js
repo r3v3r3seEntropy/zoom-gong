@@ -9,18 +9,25 @@ const App = () => {
   const [connectedToGoogle, setConnectedToGoogle] = useState(false);
   const [connectedToMicrosoft, setConnectedToMicrosoft] = useState(false);
 
+  // Zoom, Google, MS recordings
   const [recordings, setRecordings] = useState([]);
   const [googleRecordings, setGoogleRecordings] = useState([]);
   const [microsoftRecordings, setMicrosoftRecordings] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState('');
 
+  // ZoomInfo share modal
   const [showModal, setShowModal] = useState(false);
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
+  // Embedded video modal
+  const [iframeSrc, setIframeSrc] = useState('');
+  const [showIframeModal, setShowIframeModal] = useState(false);
+
+  // User info, tabs
   const [userName, setUserName] = useState('');
   const [selectedTab, setSelectedTab] = useState('recordings'); // 'profile' or 'recordings'
 
@@ -31,10 +38,11 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    // After checking status, fetch user info if connected.
+    // After checking status, fetch user info if connected
     fetchUserInfo();
   }, [connectedToZoom, connectedToGoogle]);
 
+  // ====== CHECK STATUS ======
   const checkZoomStatus = async () => {
     try {
       const response = await axios.get('http://localhost:4000/api/zoom/status');
@@ -60,7 +68,7 @@ const App = () => {
   };
 
   const checkMicrosoftStatus = async () => {
-    // Add your Microsoft logic if implemented
+    // Example placeholder for Microsoft logic
     try {
       const response = await axios.get('http://localhost:4000/api/microsoft/status');
       if (response.data.connected) {
@@ -72,6 +80,7 @@ const App = () => {
     }
   };
 
+  // ====== FETCH RECORDINGS ======
   const fetchZoomRecordings = async () => {
     try {
       const response = await axios.get('http://localhost:4000/api/zoom/recordings');
@@ -99,6 +108,7 @@ const App = () => {
     }
   };
 
+  // ====== USER INFO ======
   const fetchUserInfo = async () => {
     try {
       if (connectedToGoogle) {
@@ -106,7 +116,11 @@ const App = () => {
         setUserName(response.data.name || 'Google User');
       } else if (connectedToZoom) {
         const response = await axios.get('http://localhost:4000/api/zoom/userinfo');
-        setUserName(response.data.first_name ? `${response.data.first_name} ${response.data.last_name}` : 'Zoom User');
+        setUserName(
+          response.data.first_name
+            ? `${response.data.first_name} ${response.data.last_name}`
+            : 'Zoom User'
+        );
       } else {
         setUserName('');
       }
@@ -115,6 +129,7 @@ const App = () => {
     }
   };
 
+  // ====== SIGN IN/OUT HANDLERS ======
   const handleSignInWithZoom = () => {
     window.location.href = 'http://localhost:4000/auth/zoom';
   };
@@ -137,22 +152,26 @@ const App = () => {
       setGoogleRecordings([]);
       setMicrosoftRecordings([]);
       setUserName('');
+      setSearchTerm('');
     } catch (error) {
       console.error('Error logging out:', error);
     }
   };
 
+  // ====== HELPER ======
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
     return date.toLocaleString();
   };
 
+  // Zoom recordings filtering
   const filteredRecordings = recordings.filter((meeting) => {
     const topicMatch = meeting.topic?.toLowerCase().includes(searchTerm.toLowerCase());
     const meetingIdMatch = meeting.id?.toString().includes(searchTerm);
-    return (topicMatch || meetingIdMatch);
+    return topicMatch || meetingIdMatch;
   });
 
+  // ====== ZOOMINFO SHARE MODAL ======
   const handleShareClick = () => {
     setShowModal(true);
   };
@@ -179,7 +198,32 @@ const App = () => {
     }, 100);
   };
 
-  // If not connected to any service, show sign-in page
+  // ====== EMBED/IFRAME MODAL ======
+  // For Zoom recordings (download_url)
+  const openZoomIframe = (downloadUrl) => {
+    const embedUrl = `http://localhost:4000/api/zoom/embed?url=${encodeURIComponent(
+      downloadUrl
+    )}`;
+    setIframeSrc(embedUrl);
+    setShowIframeModal(true);
+  };
+
+  // For Google recordings (fileId)
+  const openGoogleIframe = (fileId) => {
+    const embedUrl = `http://localhost:4000/api/google/embed?fileId=${encodeURIComponent(
+      fileId
+    )}`;
+    setIframeSrc(embedUrl);
+    setShowIframeModal(true);
+  };
+
+  // Close the embed modal
+  const closeIframeModal = () => {
+    setShowIframeModal(false);
+    setIframeSrc('');
+  };
+
+  // ====== SIGN-IN SCREEN (if no providers connected) ======
   if (!connectedToZoom && !connectedToGoogle && !connectedToMicrosoft) {
     return (
       <div style={styles.signInContainer}>
@@ -188,7 +232,7 @@ const App = () => {
             <h2 style={styles.signInLeftTitle}>Workplace</h2>
             <p style={styles.signInLeftDesc}>
               Work happy with AI Companion 2.0 (coming soon).  
-              <br/><br/>
+              <br /><br />
               Get more done by surfacing important information, prioritizing what matters most,
               and turning every interaction into action with your AI personal assistant.
             </p>
@@ -202,21 +246,21 @@ const App = () => {
                 <img
                   src={process.env.PUBLIC_URL + '/zoom.svg'}
                   alt="Zoom SSO"
-                  style={{ width: "30px", height: "30px" }}
+                  style={{ width: '30px', height: '30px' }}
                 />
               </button>
               <button style={styles.ssoBtn} onClick={handleSignInWithGoogle}>
                 <img
                   src={process.env.PUBLIC_URL + '/google.svg'}
                   alt="Google SSO"
-                  style={{ width: "30px", height: "30px" }}
+                  style={{ width: '30px', height: '30px' }}
                 />
               </button>
               <button style={styles.ssoBtn} onClick={handleSignInWithMicrosoft}>
                 <img
                   src={process.env.PUBLIC_URL + '/microsoft.svg'}
                   alt="Microsoft SSO"
-                  style={{ width: "30px", height: "30px" }}
+                  style={{ width: '30px', height: '30px' }}
                 />
               </button>
             </div>
@@ -226,7 +270,7 @@ const App = () => {
     );
   }
 
-  // Main content after sign-in
+  // ====== MAIN APP (once signed in) ======
   return (
     <div style={styles.appContainer}>
       <div style={styles.sidebar}>
@@ -234,14 +278,20 @@ const App = () => {
         <nav style={styles.nav}>
           <a
             href="#profile"
-            style={{ ...styles.navLink, ...(selectedTab === 'profile' ? styles.activeNavLink : {})}}
+            style={{ 
+              ...styles.navLink,
+              ...(selectedTab === 'profile' ? styles.activeNavLink : {})
+            }}
             onClick={() => setSelectedTab('profile')}
           >
             Profile
           </a>
           <a
             href="#recordings"
-            style={{ ...styles.navLink, ...(selectedTab === 'recordings' ? styles.activeNavLink : {})}}
+            style={{ 
+              ...styles.navLink, 
+              ...(selectedTab === 'recordings' ? styles.activeNavLink : {})
+            }}
             onClick={() => setSelectedTab('recordings')}
           >
             Recordings
@@ -268,8 +318,13 @@ const App = () => {
         <div style={styles.bodyContent}>
           {selectedTab === 'profile' && (
             <div style={styles.profileDashboard}>
-              <h2 style={{fontSize:'1.5rem', marginBottom:'20px'}}>Welcome, {userName || 'User'}!</h2>
-              <p style={{fontSize:'1rem', color:'#555'}}>This is your dashboard. You can add more information and features here to provide a personalized overview.</p>
+              <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>
+                Welcome, {userName || 'User'}!
+              </h2>
+              <p style={{ fontSize: '1rem', color: '#555' }}>
+                This is your dashboard. You can add more information and features here
+                to provide a personalized overview.
+              </p>
             </div>
           )}
 
@@ -326,22 +381,35 @@ const App = () => {
                           </tr>
                         ) : (
                           filteredRecordings.map((meeting) => {
-                            const recordingFile = meeting.recording_files && meeting.recording_files[0];
-                            const thumbnailURL = recordingFile?.thumbnail_url || 'https://via.placeholder.com/150x80';
+                            const recordingFile = 
+                              meeting.recording_files && meeting.recording_files[0];
+                            const thumbnailURL = 
+                              recordingFile?.thumbnail_url || 'https://via.placeholder.com/150x80';
 
                             const totalSize = meeting.recording_files
-                              ? meeting.recording_files.reduce((acc, f) => acc + (f.file_size || 0), 0)
+                              ? meeting.recording_files.reduce(
+                                  (acc, f) => acc + (f.file_size || 0),
+                                  0
+                                )
                               : 0;
                             const sizeKB = (totalSize / 1024).toFixed(0);
-                            const filesCount = meeting.recording_files ? meeting.recording_files.length : 0;
+                            const filesCount = meeting.recording_files
+                              ? meeting.recording_files.length
+                              : 0;
 
                             return (
                               <tr key={meeting.uuid} style={styles.tr}>
                                 <td style={styles.td}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                  <div 
+                                    style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+                                  >
                                     <input type="checkbox" />
                                     <div style={styles.thumbnailWrapper}>
-                                      <img src={thumbnailURL} alt="Recording Thumbnail" style={styles.thumbnailImage} />
+                                      <img 
+                                        src={thumbnailURL}
+                                        alt="Recording Thumbnail"
+                                        style={styles.thumbnailImage}
+                                      />
                                       <div style={styles.thumbOverlay}>
                                         <span style={styles.overlayItem}>👁️ 0</span>
                                         <span style={styles.overlayItem}>00:00:11</span>
@@ -355,23 +423,52 @@ const App = () => {
                                 <td style={styles.td}>
                                   <div style={styles.participantIcon}>R</div>
                                 </td>
-                                <td style={styles.td}>{filesCount} {filesCount === 1 ? 'File' : 'Files'} ({sizeKB} KB)</td>
                                 <td style={styles.td}>
-                                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                    <button style={styles.iconZoomInfoActionBtn} onClick={handleShareClick}>
+                                  {filesCount} {filesCount === 1 ? 'File' : 'Files'} 
+                                  ({sizeKB} KB)
+                                </td>
+                                <td style={styles.td}>
+                                  <div 
+                                    style={{ display: 'flex', gap: '10px', alignItems: 'center' }}
+                                  >
+                                    {/* Share (ZoomInfo) */}
+                                    <button 
+                                      style={styles.iconZoomInfoActionBtn}
+                                      onClick={handleShareClick}
+                                    >
                                       <img
                                         src={process.env.PUBLIC_URL + '/zoominfo-Logo.png'}
                                         alt="ZoomInfo"
-                                        style={{ width: "70px", height: "35px" }}
+                                        style={{ width: '70px', height: '35px' }}
                                       />
                                     </button>
+
+                                    {/* Gong (placeholder) */}
                                     <button style={styles.iconGongInfoActionBtn}>
                                       <img
                                         src={process.env.PUBLIC_URL + '/gong.png'}
                                         alt="Gong"
-                                        style={{ width: "70px", height: "35px" }}
+                                        style={{ width: '70px', height: '35px' }}
                                       />
                                     </button>
+
+                                    {/* Embed button: open Zoom iframe */}
+                                    {recordingFile && (
+                                      <button
+                                        style={{
+                                          padding: '6px 10px',
+                                          border: '1px solid #0E71EB',
+                                          background: '#fff',
+                                          borderRadius: '4px',
+                                          cursor: 'pointer',
+                                          fontSize: '12px',
+                                          color: '#0E71EB'
+                                        }}
+                                        onClick={() => openZoomIframe(recordingFile.download_url)}
+                                      >
+                                        Play
+                                      </button>
+                                    )}
                                   </div>
                                 </td>
                               </tr>
@@ -394,7 +491,9 @@ const App = () => {
 
               {connectedToGoogle && (
                 <div style={styles.recordingsContainer}>
-                  <h2 style={styles.headerTitle}>Google Meet Recordings (Google Drive)</h2>
+                  <h2 style={styles.headerTitle}>
+                    Google Meet Recordings (Google Drive)
+                  </h2>
                   <div style={styles.tabs}>
                     <div style={{ ...styles.tab, ...styles.activeTab }}>Drive Videos</div>
                   </div>
@@ -413,19 +512,36 @@ const App = () => {
                       <tbody>
                         {googleRecordings.length === 0 ? (
                           <tr>
-                            <td colSpan="5" style={styles.noResultsCell}>No recordings found in Google Drive.</td>
+                            <td colSpan="5" style={styles.noResultsCell}>
+                              No recordings found in Google Drive.
+                            </td>
                           </tr>
                         ) : (
                           googleRecordings.map((file) => {
-                            const sizeKB = file.size ? (file.size / 1024).toFixed(0) : 0;
+                            const sizeKB = file.size
+                              ? (file.size / 1024).toFixed(0)
+                              : 0;
                             return (
                               <tr key={file.id} style={styles.tr}>
                                 <td style={styles.td}>
                                   <div style={styles.thumbnailWrapper}>
                                     {file.thumbnailLink ? (
-                                      <img src={file.thumbnailLink} alt="Thumbnail" style={styles.thumbnailImage} />
+                                      <img
+                                        src={file.thumbnailLink}
+                                        alt="Thumbnail"
+                                        style={styles.thumbnailImage}
+                                      />
                                     ) : (
-                                      <div style={{...styles.thumbnailWrapper, display:'flex',justifyContent:'center',alignItems:'center'}}>No Thumbnail</div>
+                                      <div
+                                        style={{
+                                          ...styles.thumbnailWrapper,
+                                          display: 'flex',
+                                          justifyContent: 'center',
+                                          alignItems: 'center'
+                                        }}
+                                      >
+                                        No Thumbnail
+                                      </div>
                                     )}
                                   </div>
                                 </td>
@@ -433,20 +549,43 @@ const App = () => {
                                 <td style={styles.td}>{formatDate(file.createdTime)}</td>
                                 <td style={styles.td}>{sizeKB} KB</td>
                                 <td style={styles.td}>
-                                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                    <button style={styles.iconZoomInfoActionBtn} onClick={handleShareClick}>
+                                  <div 
+                                    style={{ display: 'flex', gap: '10px', alignItems: 'center' }}
+                                  >
+                                    {/* Share (ZoomInfo) */}
+                                    <button
+                                      style={styles.iconZoomInfoActionBtn}
+                                      onClick={handleShareClick}
+                                    >
                                       <img
                                         src={process.env.PUBLIC_URL + '/zoominfo-Logo.png'}
                                         alt="ZoomInfo"
-                                        style={{ width: "70px", height: "35px" }}
+                                        style={{ width: '70px', height: '35px' }}
                                       />
                                     </button>
+                                    {/* Gong (placeholder) */}
                                     <button style={styles.iconGongInfoActionBtn}>
                                       <img
                                         src={process.env.PUBLIC_URL + '/gong.png'}
                                         alt="Gong"
-                                        style={{ width: "70px", height: "35px" }}
+                                        style={{ width: '70px', height: '35px' }}
                                       />
+                                    </button>
+
+                                    {/* Embed button: open Google iframe */}
+                                    <button
+                                      style={{
+                                        padding: '6px 10px',
+                                        border: '1px solid #0E71EB',
+                                        background: '#fff',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        fontSize: '12px',
+                                        color: '#0E71EB'
+                                      }}
+                                      onClick={() => openGoogleIframe(file.id)}
+                                    >
+                                      Play
                                     </button>
                                   </div>
                                 </td>
@@ -462,9 +601,13 @@ const App = () => {
 
               {connectedToMicrosoft && (
                 <div style={styles.recordingsContainer}>
-                  <h2 style={styles.headerTitle}>Microsoft Teams Recordings (OneDrive/SharePoint)</h2>
+                  <h2 style={styles.headerTitle}>
+                    Microsoft Teams Recordings (OneDrive/SharePoint)
+                  </h2>
                   <div style={styles.tabs}>
-                    <div style={{ ...styles.tab, ...styles.activeTab }}>Teams Recordings</div>
+                    <div style={{ ...styles.tab, ...styles.activeTab }}>
+                      Teams Recordings
+                    </div>
                   </div>
 
                   <div style={styles.tableContainer}>
@@ -481,19 +624,36 @@ const App = () => {
                       <tbody>
                         {microsoftRecordings.length === 0 ? (
                           <tr>
-                            <td colSpan="5" style={styles.noResultsCell}>No recordings found in Microsoft storage.</td>
+                            <td colSpan="5" style={styles.noResultsCell}>
+                              No recordings found in Microsoft storage.
+                            </td>
                           </tr>
                         ) : (
                           microsoftRecordings.map((file) => {
-                            const sizeKB = file.size ? (file.size / 1024).toFixed(0) : 0;
+                            const sizeKB = file.size
+                              ? (file.size / 1024).toFixed(0)
+                              : 0;
                             return (
                               <tr key={file.id} style={styles.tr}>
                                 <td style={styles.td}>
                                   <div style={styles.thumbnailWrapper}>
                                     {file.thumbnailLink ? (
-                                      <img src={file.thumbnailLink} alt="Thumbnail" style={styles.thumbnailImage} />
+                                      <img
+                                        src={file.thumbnailLink}
+                                        alt="Thumbnail"
+                                        style={styles.thumbnailImage}
+                                      />
                                     ) : (
-                                      <div style={{...styles.thumbnailWrapper, display:'flex',justifyContent:'center',alignItems:'center'}}>No Thumbnail</div>
+                                      <div
+                                        style={{
+                                          ...styles.thumbnailWrapper,
+                                          display: 'flex',
+                                          justifyContent: 'center',
+                                          alignItems: 'center'
+                                        }}
+                                      >
+                                        No Thumbnail
+                                      </div>
                                     )}
                                   </div>
                                 </td>
@@ -501,21 +661,27 @@ const App = () => {
                                 <td style={styles.td}>{formatDate(file.createdTime)}</td>
                                 <td style={styles.td}>{sizeKB} KB</td>
                                 <td style={styles.td}>
-                                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                    <button style={styles.iconZoomInfoActionBtn} onClick={handleShareClick}>
+                                  <div 
+                                    style={{ display: 'flex', gap: '10px', alignItems: 'center' }}
+                                  >
+                                    <button
+                                      style={styles.iconZoomInfoActionBtn}
+                                      onClick={handleShareClick}
+                                    >
                                       <img
                                         src={process.env.PUBLIC_URL + '/zoominfo-Logo.png'}
                                         alt="ZoomInfo"
-                                        style={{ width: "70px", height: "35px" }}
+                                        style={{ width: '70px', height: '35px' }}
                                       />
                                     </button>
                                     <button style={styles.iconGongInfoActionBtn}>
                                       <img
                                         src={process.env.PUBLIC_URL + '/gong.png'}
                                         alt="Gong"
-                                        style={{ width: "70px", height: "35px" }}
+                                        style={{ width: '70px', height: '35px' }}
                                       />
                                     </button>
+                                    {/* For MS Teams embed, you'd do something similar if you have a proxy route */}
                                   </div>
                                 </td>
                               </tr>
@@ -532,19 +698,27 @@ const App = () => {
         </div>
       </div>
 
+      {/* ZOOMINFO SHARE MODAL (upload simulation) */}
       {showModal && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
             {uploading ? (
               <div>
-                <p style={{marginBottom: '20px', textAlign:'center'}}>Uploading your file...</p>
+                <p style={{ marginBottom: '20px', textAlign: 'center' }}>
+                  Uploading your file...
+                </p>
                 <div style={styles.progressBarContainer}>
-                  <div style={{...styles.progressBarFill, width: `${uploadProgress}%`}}></div>
+                  <div
+                    style={{
+                      ...styles.progressBarFill,
+                      width: `${uploadProgress}%`
+                    }}
+                  ></div>
                 </div>
               </div>
             ) : (
               <>
-                <h3 style={{marginBottom:'10px'}}>Connect to ZoomInfo</h3>
+                <h3 style={{ marginBottom: '10px' }}>Connect to ZoomInfo</h3>
                 <input
                   type="text"
                   placeholder="User ID"
@@ -559,12 +733,57 @@ const App = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <div style={{display:'flex', gap:'10px', justifyContent:'flex-end', marginTop:'15px'}}>
-                  <button style={styles.modalBtn} onClick={() => setShowModal(false)}>Cancel</button>
-                  <button style={{...styles.modalBtn, background:'#0E71EB', color:'#fff'}} onClick={handleModalConnect}>Connect</button>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '10px',
+                    justifyContent: 'flex-end',
+                    marginTop: '15px'
+                  }}
+                >
+                  <button
+                    style={styles.modalBtn}
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    style={{
+                      ...styles.modalBtn,
+                      background: '#0E71EB',
+                      color: '#fff'
+                    }}
+                    onClick={handleModalConnect}
+                  >
+                    Connect
+                  </button>
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* EMBED/IFRAME MODAL */}
+      {showIframeModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.iframeModalContent}>
+            <button
+              onClick={closeIframeModal}
+              style={styles.closeIframeBtn}
+            >
+              X
+            </button>
+            <iframe
+              src={iframeSrc}
+              title="Recording Player"
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none'
+              }}
+              allowFullScreen
+            ></iframe>
           </div>
         </div>
       )}
@@ -572,8 +791,9 @@ const App = () => {
   );
 };
 
+// STYLES
 const styles = {
-  // Similar styling as shown before
+  // ========== SIGN-IN STYLES ==========
   signInContainer: {
     width: '100vw',
     height: '100vh',
@@ -608,8 +828,8 @@ const styles = {
     fontSize: '28px'
   },
   signInLeftDesc: {
-    color: '#fff', 
-    fontSize: '16px', 
+    color: '#fff',
+    fontSize: '16px',
     lineHeight: '1.5'
   },
   transformBtn: {
@@ -656,6 +876,7 @@ const styles = {
     fontSize: '14px',
   },
 
+  // ========== APP LAYOUT STYLES ==========
   appContainer: {
     display: 'flex',
     fontFamily: "'Inter', sans-serif",
@@ -702,6 +923,7 @@ const styles = {
     color: '#fff',
     borderRadius: '4px'
   },
+
   mainContent: {
     flex: 1,
     display: 'flex',
@@ -759,7 +981,6 @@ const styles = {
     flexDirection: 'column',
     gap: '20px'
   },
-
   profileDashboard: {
     backgroundColor: '#fff',
     borderRadius: '8px',
@@ -767,6 +988,7 @@ const styles = {
     boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
   },
 
+  // ========== RECORDINGS STYLES ==========
   recordingsContainer: {
     backgroundColor: '#ffffff',
     borderRadius: '8px',
@@ -836,7 +1058,7 @@ const styles = {
     borderRadius: '4px',
     background: '#fff',
     cursor: 'pointer',
-    fontSize: '14px',
+    fontSize: '14px'
   },
   activeViewToggle: {
     borderColor: '#0e71eb',
@@ -975,56 +1197,79 @@ const styles = {
     justifyContent: 'center'
   },
 
+  // ========== MODAL (ZoomInfo) STYLES ==========
   modalOverlay: {
     position: 'fixed',
-    top:0,
-    left:0,
-    width:'100%',
-    height:'100%',
-    backgroundColor:'rgba(0,0,0,0.5)',
-    display:'flex',
-    justifyContent:'center',
-    alignItems:'center',
-    zIndex:1000,
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
     padding: '20px'
   },
   modalContent: {
-    background:'#fff',
-    padding:'20px',
-    borderRadius:'8px',
-    width:'300px',
-    display:'flex',
-    flexDirection:'column',
-    gap:'10px',
+    background: '#fff',
+    padding: '20px',
+    borderRadius: '8px',
+    width: '300px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
     boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
   },
   modalInput: {
-    padding:'8px',
-    border:'1px solid #ddd',
-    borderRadius:'4px',
+    padding: '8px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
     fontSize: '14px'
   },
   modalBtn: {
-    padding:'8px 12px',
-    border:'1px solid #ddd',
-    borderRadius:'4px',
-    background:'#fff',
-    cursor:'pointer',
-    fontSize:'14px'
+    padding: '8px 12px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    background: '#fff',
+    cursor: 'pointer',
+    fontSize: '14px'
   },
   progressBarContainer: {
-    width:'100%',
-    height:'10px',
-    backgroundColor:'#eee',
-    borderRadius:'4px',
-    overflow:'hidden'
+    width: '100%',
+    height: '10px',
+    backgroundColor: '#eee',
+    borderRadius: '4px',
+    overflow: 'hidden'
   },
   progressBarFill: {
-    height:'100%',
-    backgroundColor:'green',
-    transition:'width 0.1s linear'
+    height: '100%',
+    backgroundColor: 'green',
+    transition: 'width 0.1s linear'
   },
 
+  // ========== MODAL (IFRAME) STYLES ==========
+  iframeModalContent: {
+    position: 'relative',
+    width: '80%',
+    height: '80%',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    overflow: 'hidden'
+  },
+  closeIframeBtn: {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    border: 'none',
+    backgroundColor: '#696867',
+    color: '#fff',
+    borderRadius: '4px',
+    padding: '5px 10px',
+    cursor: 'pointer'
+  },
+
+  // ========== RESPONSIVE ==========
   '@media (max-width: 768px)': {
     signInBox: {
       flexDirection: 'column'
