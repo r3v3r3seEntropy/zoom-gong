@@ -1,9 +1,8 @@
-// App.js (Frontend)
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ReactPlayer from 'react-player'; // Import ReactPlayer
 
 axios.defaults.withCredentials = true;
-
 const App = () => {
   const [connectedToZoom, setConnectedToZoom] = useState(false);
   const [connectedToGoogle, setConnectedToGoogle] = useState(false);
@@ -198,25 +197,20 @@ const App = () => {
     }, 100);
   };
 
-  // ====== EMBED/IFRAME MODAL ======
-  // For Zoom recordings (download_url)
   const openZoomIframe = (downloadUrl) => {
-    const embedUrl = `http://localhost:4000/api/zoom/embed?url=${encodeURIComponent(
-      downloadUrl
-    )}`;
-    setIframeSrc(embedUrl);
+    const encodedDownloadUrl = encodeURIComponent(downloadUrl);
+    const proxyUrl = `http://localhost:4000/api/zoom/proxy?zoomRecordingUrl=${encodedDownloadUrl}`;
+    setIframeSrc(proxyUrl);
     setShowIframeModal(true);
   };
-
+  
   // For Google recordings (fileId)
   const openGoogleIframe = (fileId) => {
-    const embedUrl = `http://localhost:4000/api/google/embed?fileId=${encodeURIComponent(
-      fileId
-    )}`;
+    const embedUrl = `http://localhost:4000/api/google/embed?fileId=${encodeURIComponent(fileId)}`;
     setIframeSrc(embedUrl);
     setShowIframeModal(true);
   };
-
+  
   // Close the embed modal
   const closeIframeModal = () => {
     setShowIframeModal(false);
@@ -766,27 +760,22 @@ const App = () => {
 
       {/* EMBED/IFRAME MODAL */}
       {showIframeModal && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.iframeModalContent}>
-            <button
-              onClick={closeIframeModal}
-              style={styles.closeIframeBtn}
-            >
-              X
-            </button>
-            <iframe
-              src={iframeSrc}
-              title="Recording Player"
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none'
-              }}
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-      )}
+  <div style={styles.modalOverlay} onClick={closeIframeModal}> {/* Add onClick here */}
+    <div style={styles.iframeModalContent} onClick={(e) => e.stopPropagation()}> {/* Prevent click propagation */}
+      <button onClick={(e) => { e.stopPropagation(); closeIframeModal(); }} style={styles.closeIframeBtn}>
+        X
+      </button>
+      <ReactPlayer
+        url={iframeSrc}
+        controls
+        width="100%"
+        height="100%"
+        playing={true}
+        onError={(e) => console.error('ReactPlayer Error:', e)}
+      />
+    </div>
+  </div>
+)}
     </div>
   );
 };
@@ -1199,18 +1188,19 @@ const styles = {
 
   // ========== MODAL (ZoomInfo) STYLES ==========
   modalOverlay: {
-    position: 'fixed',
+    position: 'fixed',   // Stay in place even when scrolling
     top: 0,
     left: 0,
     width: '100%',
     height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black background
     display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-    padding: '20px'
+    justifyContent: 'center', // Center the modal horizontally
+    alignItems: 'center',     // Center the modal vertically
+    zIndex: 1000,             // Ensure the modal is on top of other elements
+    padding: '20px'          // Add some padding around the modal
   },
+
   modalContent: {
     background: '#fff',
     padding: '20px',
@@ -1250,23 +1240,26 @@ const styles = {
 
   // ========== MODAL (IFRAME) STYLES ==========
   iframeModalContent: {
-    position: 'relative',
-    width: '80%',
-    height: '80%',
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    overflow: 'hidden'
+    position: 'relative',   // Needed for absolute positioning of the close button
+    width: '80%',          // Set the width of the modal
+    height: '80%',         // Set the height of the modal
+    backgroundColor: '#fff', // White background for the modal content
+    borderRadius: '8px',    // Rounded corners
+    overflow: 'hidden',      // Hide any content that overflows the modal
+    boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.3)' // Add a subtle shadow
   },
   closeIframeBtn: {
-    position: 'absolute',
-    top: '10px',
-    right: '10px',
-    border: 'none',
-    backgroundColor: '#696867',
-    color: '#fff',
-    borderRadius: '4px',
-    padding: '5px 10px',
-    cursor: 'pointer'
+    position: 'absolute',   // Position the button relative to iframeModalContent
+    top: '10px',            // 10px from the top edge
+    right: '10px',          // 10px from the right edge
+    border: 'none',         // No border
+    backgroundColor: '#696867', // Background color (adjust as needed)
+    color: '#fff',          // White text color
+    borderRadius: '4px',    // Rounded corners
+    padding: '5px 10px',    // Padding around the "X"
+    cursor: 'pointer',      // Show a pointer cursor on hover
+    zIndex: 1001,          // Ensure the button is above the ReactPlayer
+    fontSize: '16px'       // Adjust font size as needed
   },
 
   // ========== RESPONSIVE ==========
